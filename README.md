@@ -18,7 +18,7 @@ Nozoki-mai 是一个基于 Jetpack Compose 构建的 Android 应用程序，旨�
 > でらっくすRATING（DX Rating，评级）是一种能够在一定程度上对玩家实力进行量化的数值。一个玩家的DX Rating是由过去版本常规谱面的DX Rating值中最高的35个，与当前版本常规谱面的DX Rating值中最高的15个相加组成。
 
 
-## 使用方法：
+## 使用方法
 
 1. 在主页中心填入待查询的 QQ 号
 

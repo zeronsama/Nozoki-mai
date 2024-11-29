@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -32,17 +33,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import `fun`.zerrun.nozoki_mai.data.*
 import `fun`.zerrun.nozoki_mai.network.*
 import `fun`.zerrun.nozoki_mai.ui.theme.NozokimaiTheme
 import kotlinx.coroutines.launch
+
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -214,7 +223,7 @@ class MainActivity : ComponentActivity() {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
+                    .padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
@@ -259,8 +268,7 @@ class MainActivity : ComponentActivity() {
             else -> Color.White
         }
         val textColor = when (chart.level_index) {
-            0, 1, 2, 3 -> Color.Black
-            4 -> Color.Black
+            0, 1, 2, 3, 4 -> Color.Black
             else -> Color.Black
         }
 
@@ -268,27 +276,63 @@ class MainActivity : ComponentActivity() {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(backgroundColor)
-                .padding(8.dp)
+                .padding(6.dp)
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+            Row(
+                modifier = Modifier
+                    //.fillMaxWidth()
+                    .padding(6.dp)
             ) {
-                Text(
-                    text = "${index + 1}→${chart.song_id}. ${chart.title}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = textColor,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = "${chart.level}(${chart.ds})\n${String.format("%.4f", chart.achievements)} / ${chart.dxScore} / ${chart.ra}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = textColor,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Column(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .padding(end = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(
+                                "https://www.diving-fish.com/covers/${
+                                    String.format("%05d", chart.song_id)
+                                }.png"
+                            )
+                            .error(R.drawable.fail)
+                            .build(),
+                        contentDescription = "${chart.song_id}的曲绘",
+                        modifier = Modifier.size(80.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                    Text(text = "${chart.song_id}",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = 4.dp))
+                }
+
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = chart.title,
+                        style = MaterialTheme.typography.bodyLarge,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(text = String.format("%.4f", chart.achievements),
+                        style = TextStyle(fontSize = 24.sp)
+                    )
+                    Text(
+                        text = "${chart.level}(${chart.ds})→${chart.ra}    ${chart.dxScore} ",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
         }
+    }
+
+    @Preview
+    @Composable
+    fun ChartItemPreview(){
+        var chart = Chart(100.63,13.5,1693,"fv","sync","13",3,"Master",303,"sssp",11559,"魔法少女とチョコレゐト","DX")
+        ChartItem(1,chart)
     }
 }
